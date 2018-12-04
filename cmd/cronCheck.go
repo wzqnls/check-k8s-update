@@ -62,14 +62,20 @@ func cronjob() {
 
 func checkHomePage() {
 	fmt.Println("start to checkHomePage...")
-	v := strings.Replace(k8s, ".", "-", 1)
-	_, err := http.Get(fmt.Sprintf("https://%s.docs.kubernetes.io/", v))
+	resp, err := http.Get("https://kubernetes.io")
 	if err != nil {
-		fmt.Printf("home page is still not updated\n")
 		return
 	}
-	fmt.Println(Logo1)
-	fmt.Printf("kubernetes %s HomePage Update!!!\n", k8s)
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return
+	}
+	if strings.Contains(string(body), k8s) {
+		fmt.Println(Logo1)
+		fmt.Printf("kubernetes %s HomePage Update!!!\n", k8s)
+	}
+	fmt.Println("home page is still not updated")
 }
 
 func checkReleaseNote() {
